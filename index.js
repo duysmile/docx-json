@@ -2,7 +2,7 @@ const _ = require('lodash');
 const EasyDocx = require('node-easy-docx')
 
 const easyDocx = new EasyDocx({
-    path: 'de_mau_azota.docx'
+    path: './file_examples/de_mau_azota.docx'
 });
 
 function combineTextInRow(row) {
