@@ -1,0 +1,25 @@
+{
+  "name": "docx-json",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duysmile/docx-json.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duysmile/docx-json/issues"
+  },
+  "homepage": "https://github.com/duysmile/docx-json#readme",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "node-easy-docx": "^0.1.3",
+    "xml-js": "^1.6.11"
+  }
+}
