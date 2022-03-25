@@ -2,19 +2,20 @@ const _ = require('lodash');
 const EasyDocx = require('node-easy-docx')
 
 const easyDocx = new EasyDocx({
-    path: 'test.docx'
+    path: 'de_mau_azota.docx'
 });
 
-function getQuestion(row) {
+function combineTextInRow(row) {
     if (!row) {
         return '';
     }
     const { items } = row;
     if (!items) {
-        return '';
+        return row.text;
     }
     return items.reduce((text, item) => {
-        return text + item.text;
+        const itemText = item.text || '';
+        return text + itemText;
     }, '');
 }
 
@@ -46,27 +47,52 @@ function getAnswersInRow(row) {
     return answers;
 }
 
-function checkIsQuestion(question) {
-    return /^Câu \d+/.test(question);
+function checkIsQuestion(data) {
+    return /^Câu \d+/.test(data);
+}
+
+function checkIsAnswer(data) {
+    return /^[ABCDabcd]\./.test(data);
+}
+
+function convertToAnswerObj(answers) {
+    return answers.reduce((acc, answer) => {
+        const opt = answer[0];
+        acc[opt] = answer.replace(/^[ABCDabcd.]+ ?/g, '');
+        return acc;
+    }, {});
 }
 
 easyDocx.parseDocx()
     .then(data => {
-        // console.log(JSON.stringify(data, null, 2));
-        // JSON data as result
         for (let i = 0; i < data.length;) {
-            const question = getQuestion(data[i]);
+            let question = combineTextInRow(data[i]);
             let isQuestion = checkIsQuestion(question);
             if (!isQuestion) {
                 i++;
                 continue;
             }
+            let j = i;
+            do {
+                j += 1;
+                const tmp = combineTextInRow(data[j]);
+                if (tmp) {
+                    if (!checkIsAnswer(tmp)) {
+                        i++;
+                        question += ' ' + tmp;
+                    } else {
+                        break;
+                    }
+                } else {
+                    i++;
+                }
+            } while(j < data.length);
 
             console.log(question);
             let answers = [];
             do {
                 i += 1;
-                const tmp = getQuestion(data[i]);
+                const tmp = combineTextInRow(data[i]);
                 isQuestion = checkIsQuestion(tmp);
                 if (isQuestion || tmp == '') {
                     break;
@@ -75,6 +101,8 @@ easyDocx.parseDocx()
                 answers = answers.concat(getAnswersInRow(data[i]));
             } while(i < data.length);
 
+            answers = _.compact(answers);
+            answers = convertToAnswerObj(answers);
             console.log(answers);
         }
     })
